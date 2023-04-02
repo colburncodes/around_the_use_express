@@ -4,7 +4,7 @@ const { PORT = 3000 } = process.env;
 app.listen(PORT, () => {
   console.info(`
   🚀  Server is running!
-  🔉  Listening on port 3001
-  📭  Query at http://localhost:3001
+  🔉  Listening on port 3000
+  📭  Query at http://localhost:3000
 `);
 });
