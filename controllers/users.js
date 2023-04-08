@@ -1,27 +1,52 @@
 const path = require("path");
 const getJsonFromFile = require("../utils/files");
+const User = require("../models/user");
 
-const dataPath = path.join(__dirname, "..", "data", "users.json");
-const getUsers = async (req, res) => {
-  try {
-    const users = await getJsonFromFile(dataPath);
-    return res.status(200).send(users);
-  } catch (err) {
-    return res.status(500).send(err);
-  }
+const getUsers = (req, res) => {
+  User.find({})
+    .then((users) => {
+      res.status(200).send({ users });
+    })
+    .catch((error) => {
+      res.status(500).send({ message: "Error making request" });
+    });
 };
 
 const getUser = async (req, res) => {
-  return getJsonFromFile(dataPath)
-    .then((users) => users.find((user) => user.id === req.params._id))
+  const { id } = req.params;
+  User.findById(id)
     .then((user) => {
-      if (!user) {
-        return res
-          .status(404)
-          .send({ message: `User with id ${req.params._id} doesn't exist` });
-      }
-      return res.status(200).send(user);
+      res.status(200).send({ user });
     })
-    .catch((err) => res.status(500).send(err));
+    .catch(() => {
+      res.status(500).send({ message: "User does not exist" });
+    });
 };
-module.exports = { getUsers, getUser };
+
+const createUser = (req, res, next) => {
+  const { name, about, avatar } = req.body;
+  console.log(name, about, avatar);
+  User.create({ name, about, avatar })
+    .then((user) => {
+      res.status(201).send({
+        user,
+      });
+    })
+    .catch(() => {
+      res.status(500).send({ message: "Error creating user" });
+    });
+};
+
+const updateUser = (req, res, next) => {
+  const { id } = req.params;
+
+  const { name, about, avatar } = req.body;
+  User.findByIdAndUpdate(id, { $set: { name, about, avatar } })
+    .then((user) => {
+      res.status(200).send({ user });
+    })
+    .catch((error) => {
+      res.status(500).send({ message: "Error updating user", error });
+    });
+};
+module.exports = { getUsers, getUser, createUser, updateUser };
