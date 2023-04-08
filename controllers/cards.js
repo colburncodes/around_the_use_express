@@ -1,14 +1,35 @@
-const path = require("path");
-const getJsonFromFile = require("../utils/files");
+const Card = require("../models/card");
 
-const dataPath = path.join(__dirname, "..", "data", "cards.json");
 const getCards = async (req, res) => {
-  try {
-    const users = await getJsonFromFile(dataPath);
-    return res.status(200).send(users);
-  } catch (err) {
-    return res.status(400).send(err);
-  }
+  Card.find({})
+    .then((cards) => {
+      res.status(200).send({ cards });
+    })
+    .catch((error) => {
+      res.status(500).send({ message: "Error retrieving cards", error });
+    });
 };
 
-module.exports = getCards;
+const createCard = (req, res, next) => {
+  const { name, link } = req.body;
+  Card.create({ name, link, owner: req.user._id })
+    .then((card) => {
+      res.status(201).send({ card });
+    })
+    .catch((error) => {
+      res.status(500).send({ message: "Error creating card", error });
+    });
+};
+
+const getCard = (req, res, next) => {
+  const { id } = req.params;
+  Card.findById(id)
+    .then((card) => {
+      res.status(200).send({ message: card });
+    })
+    .catch((error) => {
+      res.status(500).send({ message: "Error retrieving card", error });
+    });
+};
+
+module.exports = { getCards, createCard, getCard };

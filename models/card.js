@@ -1,13 +1,13 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 const validator = require("validator");
 const { Schema } = mongoose;
 
-const card = new Schema({
+const cardSchema = new Schema({
   name: {
     type: String,
     required: true,
     minlength: 2,
-    maxlength: 3,
+    maxlength: 30,
   },
   link: {
     type: String,
@@ -34,4 +34,4 @@ const card = new Schema({
   },
 });
 
-module.exports = mongoose.model("card", card);
+module.exports = mongoose.model("card", cardSchema);

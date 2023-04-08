@@ -1,5 +1,3 @@
-const path = require("path");
-const getJsonFromFile = require("../utils/files");
 const User = require("../models/user");
 
 const getUsers = (req, res) => {
@@ -25,7 +23,6 @@ const getUser = async (req, res) => {
 
 const createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
-  console.log(name, about, avatar);
   User.create({ name, about, avatar })
     .then((user) => {
       res.status(201).send({
