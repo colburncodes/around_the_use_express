@@ -3,13 +3,15 @@ const {
   getUsers,
   getUser,
   createUser,
-  updateUser,
+  updateProfile,
+  updateAvatar,
 } = require("../controllers/users");
 
 router.get("/", getUsers);
 router.post("/", createUser);
 router.get("/:id", getUser);
-router.post("/:id", updateUser);
+router.patch("/me", updateProfile);
+router.patch("/me", updateAvatar);
 
 
 module.exports = router;

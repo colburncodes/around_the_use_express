@@ -5,15 +5,15 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
   name: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
+    required: [true, 'The "name" field is required.'],
+    minlength: [2, 'The minimum length of the "name" field is 2'],
+    maxlength: [30, 'The maximum length of the "name" field is 30'],
   },
   about: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
+    required: [true, 'The "about" field is required.'],
+    minlength: [2, 'The minimum length of the "about" field is 2'],
+    maxlength: [30, 'The maximum length of the "about" field is 30'],
   },
   avatar: {
     type: String,
