@@ -95,4 +95,35 @@ const dislikeCard = (req, res, next) => {
     });
 };
 
-module.exports = { getCards, createCard, getCard, likeCard, dislikeCard };
+const deleteCard = (req, res, next) => {
+  const { id } = req.params;
+
+  Card.findById(id)
+    .then((card) => {
+      if (card.owner.equals(req.user._id)) {
+        return card.deleteOne(() => res.send({ data: card }));
+      }
+    })
+    .catch((error) => {
+      if (error.name === "CastError") {
+        res
+          .status(Status.STATUS_CODES.BadRequest)
+          .send({ message: "Invalid ID" });
+      } else if (error.statusCode === 404) {
+        res.status(Status.STATUS_CODES.NotFound);
+      } else {
+        res
+          .status(Status.STATUS_CODES.ServerError)
+          .send({ message: "Server Error" });
+      }
+    });
+};
+
+module.exports = {
+  getCards,
+  createCard,
+  getCard,
+  likeCard,
+  dislikeCard,
+  deleteCard,
+};
