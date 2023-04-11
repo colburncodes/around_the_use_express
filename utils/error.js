@@ -1,4 +1,4 @@
-export const STATUS_CODES = {
+const STATUS_CODES = {
   Ok: 200,
   Created: 201,
   BadRequest: 400,
@@ -10,3 +10,5 @@ export const STATUS_CODES = {
   ServerError: 500,
   DuplicateError: 11000,
 };
+
+module.exports = STATUS_CODES;

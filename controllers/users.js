@@ -1,5 +1,27 @@
 const User = require("../models/user");
 const Status = require("../utils/error");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      if (user) {
+        const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+          expiresIn: "7d",
+        });
+        res.send({ email, token });
+      }
+    })
+    .catch(() => {
+      res
+        .status(Status.Unauthorized)
+        .send({ message: "Incorrect email or password" });
+    });
+};
 
 const getUsers = (req, res) => {
   User.find({})
@@ -37,24 +59,30 @@ const getUser = async (req, res) => {
 };
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => {
-      res.status(Status.STATUS_CODES.Created).send({
-        user,
-      });
-    })
-    .catch((error) => {
-      if (error.name === "ValidationError") {
-        res
-          .status(Status.STATUS_CODES.BadRequest)
-          .send({ message: error.message });
-      } else {
-        res
-          .status(Status.STATUS_CODES.ServerError)
-          .send({ message: "Error creating user" });
-      }
-    });
+  const { name, avatar, email, password } = req.body;
+
+  bcrypt.hash(password, 10).then((hash) =>
+    User.create({ name, avatar, email, password: hash })
+      .then((user) => {
+        res.status(Status.STATUS_CODES.Created).send({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+        });
+      })
+      .catch((error) => {
+        if (error.name === "ValidationError") {
+          res
+            .status(Status.STATUS_CODES.BadRequest)
+            .send({ message: error.message });
+        } else {
+          res
+            .status(Status.STATUS_CODES.ServerError)
+            .send({ message: "Error creating user" });
+        }
+      })
+  );
 };
 
 const updateProfile = (req, res, next) => {
@@ -98,4 +126,11 @@ const updateAvatar = (req, res, next) => {
       }
     });
 };
-module.exports = { getUsers, getUser, createUser, updateProfile, updateAvatar };
+module.exports = {
+  getUsers,
+  getUser,
+  createUser,
+  updateProfile,
+  updateAvatar,
+  login,
+};
