@@ -17,6 +17,4 @@ app.use((req, res, next) => {
 app.use("/", routes);
 
 
-
-
 module.exports = app;

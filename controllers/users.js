@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Status = require("../utils/error");
 const { JWT_SECRET } = require("../utils/config");
@@ -40,11 +40,12 @@ const getUser = async (req, res) => {
 };
 
 const createUser = (req, res, next) => {
-  const { name, avatar, email, password } = req.body;
+  const { name, email, password, avatar } = req.body;
 
-  bcrypt.hash(password, 10).then((hash) =>
-    User.create({ name, avatar, email, password: hash })
-      .then((user) => {
+  bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({ name, email, password: hash, avatar }).then((user) => {
         res.status(Status.Created).send({
           _id: user._id,
           name: user.name,
@@ -52,16 +53,14 @@ const createUser = (req, res, next) => {
           avatar: user.avatar,
         });
       })
-      .catch((error) => {
-        if (error.name === "ValidationError") {
-          res.status(Status.BadRequest).send({ message: error.message });
-        } else {
-          res
-            .status(Status.ServerError)
-            .send({ message: "Error creating user" });
-        }
-      })
-  );
+    )
+    .catch((error) => {
+      if (error.name === "ValidationError") {
+        res.status(Status.BadRequest).send({ message: error.message });
+      } else {
+        res.status(Status.ServerError).send({ message: "Error creating user" });
+      }
+    });
 };
 
 const updateProfile = (req, res, next) => {
